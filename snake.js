@@ -10,16 +10,20 @@ let snake = [
 ];
 
 let score = 0;
+let bestScore = 0;
 
 let dx = 10;
 let dy = 0;
 
 function main() {
     if (didGameEnd()) {
+        clearTimeout(timeoutID);
         return;
     }
-    setTimeout(function onTick() {changingDirection = false; clearCanvas(); drawFood(); advanceSnake(); drawSnake(); main(); }, 150)
+    var timeoutID = setTimeout(function onTick() {changingDirection = false; clearCanvas(); drawFood(); advanceSnake(); drawSnake(); main(); }, 150)
 }
+
+document.addEventListener("keydown", changeDirection)
 
 function drawSnakePart(snakePart) {
     context.fillStyle = 'lightGreen';
@@ -39,7 +43,11 @@ function advanceSnake() {
     const didEatFood = snake[0].x == foodX && snake[0].y == foodY;
     if (didEatFood) {
         score++;
-        document.getElementById('score').innerHTML = score;
+        document.getElementById('score').innerText = "SCORE: " + score;
+        if (score > bestScore) {
+            bestScore = score;
+            document.getElementById('bestScore').innerText = "BEST SCORE: " + bestScore
+        }
         createFood();
     }
     else {
@@ -53,8 +61,6 @@ function clearCanvas() {
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.strokeRect(0, 0, canvas.width, canvas.height);
 }
-
-document.addEventListener("keydown", changeDirection)
 
 function changeDirection(event) {
     if (changingDirection) {
@@ -125,6 +131,24 @@ function didGameEnd() {
     const hitTopWall = snake[0].y < 0;  
     const hitBottomWall = snake[0].y > gameCanvas.height - 10;
     return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall;
+}
+
+function replay() {
+    snake = [
+        {x: 150, y: 150},
+        {x: 140, y: 150},
+        {x: 130, y: 150},
+        {x: 120, y: 150}, 
+        {x: 110, y: 150}
+    ];
+    dx = 10;
+    dy = 0;
+
+    score = 0;
+    document.getElementById('score').innerText = "SCORE: " + score;
+
+    clearTimeout(timeoutID);
+    main();
 }
 
 createFood();
